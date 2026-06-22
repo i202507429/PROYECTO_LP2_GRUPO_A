@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}">
+	<title>Listado de Pedidos</title>
+</head>
+
+<body class="bg-light">
+
+	<div th:replace="~{fragments :: navbar}"></div>
+
+	<div class="container py-4">
+
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h2><i class="fa-solid fa-clipboard-list me-2"></i>Pedidos</h2>
+		</div>
+
+		<!-- Filtros (en vez de barra de búsqueda) -->
+		<div class="btn-group mb-3 flex-wrap" role="group" aria-label="Filtrar por estado">
+			<button type="button" class="btn btn-outline-dark filter-btn active" data-filter="todos">Todos</button>
+			<button type="button" class="btn btn-outline-secondary filter-btn" data-filter="pendiente">Pendiente</button>
+			<button type="button" class="btn btn-outline-warning filter-btn" data-filter="preparando">Preparando</button>
+			<button type="button" class="btn btn-outline-success filter-btn" data-filter="listo">Listo</button>
+			<button type="button" class="btn btn-outline-primary filter-btn" data-filter="pagado">Pagado</button>
+		</div>
+
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<table class="table table-hover align-middle mb-0">
+					<thead class="table-dark">
+						<tr>
+							<th>#</th>
+							<th>Fecha</th>
+							<th>Cliente</th>
+							<th>Pago</th>
+							<th>Total</th>
+							<th>Estado</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="pedido : ${lstPedidos}" th:attr="data-estado=${pedido.estado}">
+							<td th:text="${pedido.idPedido}"></td>
+							<td th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}"></td>
+							<td th:text="${pedido.nombreCliente != null ? pedido.nombreCliente : (pedido.usuario.nombres + ' ' + pedido.usuario.apellidos)}"></td>
+							<td th:text="${pedido.metodoPago ?: '-'}"></td>
+							<td th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}"></td>
+							<td>
+								<span th:classappend="
+									${pedido.estado == 'pendiente'} ? 'badge bg-secondary' :
+									(${pedido.estado == 'preparando'} ? 'badge bg-warning text-dark' :
+									(${pedido.estado == 'listo'} ? 'badge bg-success' : 'badge bg-primary'))"
+									th:text="${pedido.estado}">
+								</span>
+							</td>
+							<td class="d-flex gap-1">
+								<a th:href="@{/pedido/detalle/{id}(id=${pedido.idPedido})}" class="btn btn-sm btn-info text-white">
+									<i class="fa-solid fa-eye"></i>
+								</a>
+								<form th:action="@{/pedido/cambiar-estado/{id}(id=${pedido.idPedido})}" method="post" class="d-flex gap-1">
+									<select name="estado" class="form-select form-select-sm" style="width: auto;">
+										<option value="pendiente" th:selected="${pedido.estado == 'pendiente'}">Pendiente</option>
+										<option value="preparando" th:selected="${pedido.estado == 'preparando'}">Preparando</option>
+										<option value="listo" th:selected="${pedido.estado == 'listo'}">Listo</option>
+										<option value="pagado" th:selected="${pedido.estado == 'pagado'}">Pagado</option>
+									</select>
+									<button type="submit" class="btn btn-sm btn-warning">
+										<i class="fa-solid fa-rotate"></i>
+									</button>
+								</form>
+							</td>
+						</tr>
+						<tr th:if="${#lists.isEmpty(lstPedidos)}">
+							<td colspan="7" class="text-center text-muted py-3">No hay pedidos registrados</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+
+	<div th:if="${toast}" th:utext="${toast}"></div>
+
+	<script>
+		document.querySelectorAll('.filter-btn').forEach(function (btn) {
+			btn.addEventListener('click', function () {
+				document.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
+				this.classList.add('active');
+				var filtro = this.dataset.filter;
+				document.querySelectorAll('tbody tr[data-estado]').forEach(function (row) {
+					row.style.display = (filtro === 'todos' || row.dataset.estado === filtro) ? '' : 'none';
+				});
+			});
+		});
+	</script>
+
+</body>
+
+</html>

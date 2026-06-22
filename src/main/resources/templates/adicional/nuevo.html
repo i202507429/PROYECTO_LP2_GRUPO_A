@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}">
+	<title>Nuevo Adicional</title>
+</head>
+
+<body class="bg-light">
+
+	<div th:replace="~{fragments :: navbar}"></div>
+
+	<div class="container py-4">
+
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h2><i class="fa-solid fa-plus-circle me-2"></i>Nuevo Adicional</h2>
+			<a href="/adicional/listado" class="btn btn-secondary">
+				<i class="fa-solid fa-arrow-left me-1"></i>Volver
+			</a>
+		</div>
+
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<form th:action="@{/adicional/registrar}" th:object="${adicional}" method="post">
+
+					<div class="mb-3">
+						<label class="form-label fw-bold">Descripción</label>
+						<input type="text" class="form-control" th:field="*{descripcion}" placeholder="Ej: Gaseosa personal" required />
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label fw-bold">Precio</label>
+						<div class="input-group">
+							<span class="input-group-text">S/</span>
+							<input type="number" step="0.01" min="0.01" class="form-control" th:field="*{precio}" placeholder="0.00" required />
+						</div>
+					</div>
+
+					<div class="d-flex justify-content-end gap-2">
+						<a href="/adicional/listado" class="btn btn-secondary">
+							<i class="fa-solid fa-xmark me-1"></i>Cancelar
+						</a>
+						<button type="submit" class="btn btn-primary">
+							<i class="fa-solid fa-floppy-disk me-1"></i>Registrar
+						</button>
+					</div>
+
+				</form>
+			</div>
+		</div>
+
+	</div>
+
+	<div th:if="${alert}" th:utext="${alert}"></div>
+
+</body>
+
+</html>

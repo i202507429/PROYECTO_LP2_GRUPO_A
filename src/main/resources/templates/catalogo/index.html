@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}">
+	<title>Catálogo</title>
+</head>
+
+<body class="bg-light">
+
+	<nav class="navbar navbar-dark bg-danger mb-4">
+		<div class="container">
+			<span class="navbar-brand mb-0 h1"><i class="fa-solid fa-pizza-slice me-2"></i>Pizzería</span>
+			<button class="btn btn-light position-relative" data-bs-toggle="offcanvas" data-bs-target="#carrito">
+				<i class="fa-solid fa-cart-shopping"></i>
+				<span class="badge bg-dark position-absolute top-0 start-100 translate-middle rounded-pill" id="contadorCarrito">0</span>
+			</button>
+		</div>
+	</nav>
+
+	<div class="container pb-5">
+
+		<div class="mb-4 d-flex flex-wrap gap-2">
+			<button type="button" class="btn btn-danger filtro-pizza active" data-nombre="todas">Todas</button>
+			<button type="button" class="btn btn-outline-danger filtro-pizza"
+				th:each="pizza : ${lstPizzas}"
+				th:attr="data-nombre=${#strings.toLowerCase(pizza.nombre)}"
+				th:text="${pizza.nombre}">
+			</button>
+		</div>
+
+		<h4 class="mb-3"><i class="fa-solid fa-pizza-slice me-2 text-danger"></i>Pizzas</h4>
+		<div class="row g-4 mb-5">
+			<div class="col-md-4 tarjetaPizza" th:each="pizza : ${lstPizzas}" th:attr="data-nombre=${#strings.toLowerCase(pizza.nombre)}">
+				<div class="card h-100 shadow-sm">
+					<img th:src="@{'/img/pizzas/' + ${pizza.imagen}}" class="card-img-top" style="height:180px; object-fit:cover;" th:alt="${pizza.nombre}">
+					<div class="card-body">
+						<h5 class="card-title" th:text="${pizza.nombre}"></h5>
+						<p class="card-text text-muted small" th:text="${pizza.descripcion}"></p>
+
+						<div th:each="pt : ${lstPizzaTamanios}" th:if="${pt.pizza.idPizza == pizza.idPizza}">
+							<div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
+								<span th:text="${pt.tamanio.descripcion}"></span>
+								<span class="fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(pt.precio, 1, 2)}"></span>
+								<button class="btn btn-sm btn-outline-danger btn-agregar-pizza"
+									th:attr="data-id=${pt.idPizzaTamanio}, data-nombre=${pizza.nombre + ' (' + pt.tamanio.descripcion + ')'}, data-precio=${pt.precio}">
+									<i class="fa-solid fa-plus"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 text-center text-muted" th:if="${#lists.isEmpty(lstPizzas)}">
+				No hay pizzas disponibles
+			</div>
+		</div>
+
+		<h4 class="mb-3"><i class="fa-solid fa-plus-circle me-2 text-success"></i>Adicionales</h4>
+		<div class="row g-3">
+			<div class="col-md-3" th:each="adicional : ${lstAdicionales}">
+				<div class="card h-100 shadow-sm">
+					<img th:src="@{'/img/adicionales/' + ${adicional.idAdicional} + '.jpg'}"
+						class="card-img-top"
+						style="height:200px; object-fit:contain; padding:10px;"
+						th:alt="${adicional.descripcion}"
+						onerror="this.src='/img/adicionales/default.jpg'">
+					<div class="card-body text-center">
+						<h6 th:text="${adicional.descripcion}"></h6>
+						<p class="fw-bold text-success" th:text="'S/ ' + ${#numbers.formatDecimal(adicional.precio, 1, 2)}"></p>
+						<button class="btn btn-sm btn-outline-success btn-agregar-adicional"
+							th:attr="data-id=${adicional.idAdicional}, data-nombre=${adicional.descripcion}, data-precio=${adicional.precio}">
+							<i class="fa-solid fa-plus me-1"></i>Agregar
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<div class="offcanvas offcanvas-end" tabindex="-1" id="carrito">
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title"><i class="fa-solid fa-cart-shopping me-2"></i>Tu pedido</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+		</div>
+		<div class="offcanvas-body d-flex flex-column">
+			<div id="itemsCarrito" class="flex-grow-1">
+				<p class="text-muted text-center mt-4">Tu carrito está vacío</p>
+			</div>
+			<hr>
+			<h5 class="text-end">Total: S/ <span id="totalCarrito">0.00</span></h5>
+			<button class="btn btn-danger w-100" id="btnRealizarPedido" disabled>
+				<i class="fa-solid fa-check me-1"></i>Realizar Pedido
+			</button>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modalPedido" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Datos del pedido</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3">
+						<label class="form-label fw-bold">Tu nombre</label>
+						<input type="text" class="form-control" id="nombreCliente" placeholder="Ej: Juan Pérez">
+					</div>
+					<div class="mb-3">
+						<label class="form-label fw-bold">Método de pago</label>
+						<select class="form-select" id="metodoPago">
+							<option value="Efectivo">Efectivo</option>
+							<option value="Tarjeta">Tarjeta</option>
+							<option value="Yape">Yape</option>
+						</select>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-danger" id="btnConfirmarPedido">Confirmar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var carrito = [];
+
+		$(document).on('click', '.filtro-pizza', function () {
+			$('.filtro-pizza').removeClass('active btn-danger').addClass('btn-outline-danger');
+			$(this).removeClass('btn-outline-danger').addClass('active btn-danger');
+
+			var seleccion = $(this).data('nombre').toString().toLowerCase();
+			$('.tarjetaPizza').each(function () {
+				var nombre = $(this).attr('data-nombre');
+				var coincide = (seleccion === 'todas') || (nombre === seleccion);
+				$(this).toggle(coincide);
+			});
+		});
+
+		$('.btn-agregar-pizza').on('click', function () {
+			agregarItem('pizza', $(this).data('id'), $(this).data('nombre'), parseFloat($(this).data('precio')));
+		});
+
+		$('.btn-agregar-adicional').on('click', function () {
+			agregarItem('adicional', $(this).data('id'), $(this).data('nombre'), parseFloat($(this).data('precio')));
+		});
+
+		function agregarItem(tipo, id, nombre, precio) {
+			var item = carrito.find(i => i.tipo == tipo && i.id == id);
+			if (item) {
+				item.cantidad++;
+			} else {
+				carrito.push({ tipo: tipo, id: id, nombre: nombre, precio: precio, cantidad: 1 });
+			}
+			pintarCarrito();
+		}
+
+		function cambiarCantidad(tipo, id, delta) {
+			var item = carrito.find(i => i.tipo == tipo && i.id == id);
+			item.cantidad += delta;
+			if (item.cantidad <= 0) {
+				carrito = carrito.filter(i => !(i.tipo == tipo && i.id == id));
+			}
+			pintarCarrito();
+		}
+
+		function pintarCarrito() {
+			var html = '';
+			var total = 0;
+
+			carrito.forEach(function (item) {
+				var subtotal = item.precio * item.cantidad;
+				total += subtotal;
+				html += '<div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">'
+					+ '<div><div class="fw-bold">' + item.nombre + '</div>'
+					+ '<small class="text-muted">S/ ' + item.precio.toFixed(2) + ' c/u</small></div>'
+					+ '<div class="d-flex align-items-center gap-2">'
+					+ '<button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(\'' + item.tipo + '\',' + item.id + ',-1)">-</button>'
+					+ '<span>' + item.cantidad + '</span>'
+					+ '<button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(\'' + item.tipo + '\',' + item.id + ',1)">+</button>'
+					+ '</div></div>';
+			});
+
+			$('#itemsCarrito').html(html || '<p class="text-muted text-center mt-4">Tu carrito está vacío</p>');
+			$('#totalCarrito').text(total.toFixed(2));
+			$('#contadorCarrito').text(carrito.length);
+			$('#btnRealizarPedido').prop('disabled', carrito.length == 0);
+		}
+
+		$('#btnRealizarPedido').on('click', function () {
+			$('#modalPedido').modal('show');
+		});
+
+		$('#btnConfirmarPedido').on('click', function () {
+			var nombreCliente = $('#nombreCliente').val().trim();
+
+			if (!nombreCliente) {
+				Swal.fire('Atención', 'Ingresa tu nombre para continuar', 'warning');
+				return;
+			}
+
+			var idsPizzaTamanio = [], cantidadesPizza = [], idsAdicional = [], cantidadesAdicional = [];
+
+			carrito.forEach(function (item) {
+				if (item.tipo == 'pizza') {
+					idsPizzaTamanio.push(item.id);
+					cantidadesPizza.push(item.cantidad);
+				} else {
+					idsAdicional.push(item.id);
+					cantidadesAdicional.push(item.cantidad);
+				}
+			});
+
+			$.ajax({
+				url: '/catalogo/realizar-pedido',
+				method: 'POST',
+				traditional: true,
+				data: {
+					nombreCliente: nombreCliente,
+					metodoPago: $('#metodoPago').val(),
+					idsPizzaTamanio: idsPizzaTamanio,
+					cantidadesPizza: cantidadesPizza,
+					idsAdicional: idsAdicional,
+					cantidadesAdicional: cantidadesAdicional
+				},
+				success: function (response) {
+					$('#modalPedido').modal('hide');
+					if (response.success) {
+						Swal.fire({
+							title: '¡Pedido registrado!',
+							html: 'Gracias <b>' + nombreCliente + '</b>, ' + response.mensaje,
+							icon: 'success'
+						}).then(function () {
+							carrito = [];
+							pintarCarrito();
+						});
+					} else {
+						Swal.fire('Error', response.mensaje, 'error');
+					}
+				},
+				error: function () {
+					Swal.fire('Error', 'No se pudo registrar el pedido', 'error');
+				}
+			});
+		});
+	</script>
+
+</body>
+
+</html>

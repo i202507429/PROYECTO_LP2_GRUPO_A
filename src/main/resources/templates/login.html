@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}">
+	<title>Iniciar Sesión</title>
+</head>
+
+<body class="bg-light">
+
+	<div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+		<div class="card shadow-sm" style="width: 100%; max-width: 400px;">
+			<div class="card-body p-4">
+
+				<div class="text-center mb-4">
+					<i class="fa-solid fa-pizza-slice fa-3x text-danger mb-2"></i>
+					<h3 class="fw-bold">Pizzería</h3>
+					<p class="text-muted">Ingresa tus credenciales</p>
+				</div>
+
+				<form th:action="@{/login}" method="post">
+
+					<div class="mb-3">
+						<label class="form-label fw-bold">Cuenta</label>
+						<input type="email" class="form-control" name="cuenta" placeholder="correo@pizzeria.com" required />
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label fw-bold">Clave</label>
+						<input type="password" class="form-control" name="clave" placeholder="Contraseña" required />
+					</div>
+
+					<button type="submit" class="btn btn-danger w-100">
+						<i class="fa-solid fa-right-to-bracket me-1"></i>Ingresar
+					</button>
+
+				</form>
+
+				<div class="text-center mt-3">
+					<a href="/catalogo" class="text-decoration-none">
+						<i class="fa-solid fa-arrow-left me-1"></i>Ver catálogo
+					</a>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<div th:if="${alert}" th:utext="${alert}"></div>
+
+</body>
+
+</html>

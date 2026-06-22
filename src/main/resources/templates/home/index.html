@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}">
+	<title>Inicio</title>
+</head>
+
+<body class="bg-light">
+
+	<div th:replace="~{fragments :: navbar}"></div>
+
+	<div class="container py-5">
+		<div class="text-center mb-5">
+			<h1 class="display-5 fw-bold"><i class="fa-solid fa-pizza-slice me-3 text-danger"></i>Sistema de Pedidos</h1>
+			<p class="text-muted">Panel de administración</p>
+		</div>
+
+		<div class="row g-4 justify-content-center">
+			<div class="col-md-4">
+				<div class="card shadow-sm h-100">
+					<div class="card-body text-center py-4">
+						<i class="fa-solid fa-pizza-slice fa-3x text-danger mb-3"></i>
+						<h5 class="card-title">Pizzas</h5>
+						<p class="card-text text-muted">Gestiona el catálogo de pizzas</p>
+						<a href="/pizza/listado" class="btn btn-outline-danger">Ver listado</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card shadow-sm h-100">
+					<div class="card-body text-center py-4">
+						<i class="fa-solid fa-plus-circle fa-3x text-success mb-3"></i>
+						<h5 class="card-title">Adicionales</h5>
+						<p class="card-text text-muted">Bebidas y extras disponibles</p>
+						<a href="/adicional/listado" class="btn btn-outline-success">Ver listado</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card shadow-sm h-100">
+					<div class="card-body text-center py-4">
+						<i class="fa-solid fa-clipboard-list fa-3x text-primary mb-3"></i>
+						<h5 class="card-title">Pedidos</h5>
+						<p class="card-text text-muted">Registra y gestiona pedidos</p>
+						<a href="/pedido/listado" class="btn btn-outline-primary">Ver listado</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card shadow-sm h-100">
+					<div class="card-body text-center py-4">
+						<i class="fa-solid fa-ruler fa-3x text-warning mb-3"></i>
+						<h5 class="card-title">Tamaños</h5>
+						<p class="card-text text-muted">Personal, Mediana, Familiar</p>
+						<a href="/tamanio/listado" class="btn btn-outline-warning">Ver listado</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card shadow-sm h-100">
+					<div class="card-body text-center py-4">
+						<i class="fa-solid fa-users fa-3x text-secondary mb-3"></i>
+						<h5 class="card-title">Usuarios</h5>
+						<p class="card-text text-muted">Administra el personal</p>
+						<a href="/usuario/listado" class="btn btn-outline-secondary">Ver listado</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+
+</html>

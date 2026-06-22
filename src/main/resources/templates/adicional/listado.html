@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}">
+	<title>Listado de Adicionales</title>
+</head>
+
+<body class="bg-light">
+
+	<div th:replace="~{fragments :: navbar}"></div>
+
+	<div class="container py-4">
+
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h2><i class="fa-solid fa-plus-circle me-2"></i>Adicionales</h2>
+			<a href="/adicional/nuevo" class="btn btn-primary">
+				<i class="fa-solid fa-plus me-1"></i>Nuevo Adicional
+			</a>
+		</div>
+
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<table class="table table-hover align-middle mb-0">
+					<thead class="table-dark">
+						<tr>
+							<th>#</th>
+							<th>Descripción</th>
+							<th>Precio</th>
+							<th>Estado</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="adicional : ${lstAdicionales}">
+							<td th:text="${adicional.idAdicional}"></td>
+							<td th:text="${adicional.descripcion}"></td>
+							<td th:text="'S/ ' + ${#numbers.formatDecimal(adicional.precio, 1, 2)}"></td>
+							<td>
+								<span th:classappend="${adicional.activo} ? 'badge bg-success' : 'badge bg-danger'"
+									th:text="${adicional.activo} ? 'Activo' : 'Inactivo'">
+								</span>
+							</td>
+							<td class="d-flex gap-1">
+								<a th:href="@{/adicional/edicion/{id}(id=${adicional.idAdicional})}" class="btn btn-sm btn-warning">
+									<i class="fa-solid fa-pen-to-square"></i>
+								</a>
+								<form th:action="@{/adicional/cambiar-estado/{id}(id=${adicional.idAdicional})}" method="post">
+									<button type="submit" class="btn btn-sm" th:classappend="${adicional.activo} ? 'btn-secondary' : 'btn-success'"
+										th:title="${adicional.activo} ? 'Desactivar' : 'Activar'">
+										<i class="fa-solid" th:classappend="${adicional.activo} ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+									</button>
+								</form>
+								<form th:action="@{/adicional/eliminar/{id}(id=${adicional.idAdicional})}" method="post" class="form-eliminar">
+									<button type="submit" class="btn btn-sm btn-danger">
+										<i class="fa-solid fa-trash"></i>
+									</button>
+								</form>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+
+	<div th:if="${toast}" th:utext="${toast}"></div>
+
+	<script>
+		document.querySelectorAll('.form-eliminar').forEach(function (form) {
+			form.addEventListener('submit', function (e) {
+				e.preventDefault();
+				Swal.fire({
+					title: '¿Eliminar?',
+					text: 'Esta acción no se puede deshacer',
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonText: 'Sí, eliminar',
+					cancelButtonText: 'Cancelar',
+					confirmButtonColor: '#dc3545'
+				}).then(function (result) {
+					if (result.isConfirmed) form.submit();
+				});
+			});
+		});
+	</script>
+
+</body>
+
+</html>
