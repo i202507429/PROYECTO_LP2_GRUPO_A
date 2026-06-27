@@ -16,40 +16,46 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
 
-	private final UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
-	@GetMapping("/")
-	public String login() {
-		return "login";
-	}
+    @GetMapping("/")
+    public String login() {
+        return "login";
+    }
 
-	@PostMapping("/login")
-	public String login(
-			@RequestParam String cuenta,
-			@RequestParam String clave,
-			HttpSession session,
-			Model model) {
+    @PostMapping("/login")
+    public String login(
+            @RequestParam String cuenta,
+            @RequestParam String clave,
+            HttpSession session,
+            Model model) {
 
-		var usuarioOpt = usuarioRepository.findByCuentaAndClave(cuenta, clave);
+        var usuarioOpt = usuarioRepository.findByCuentaAndClave(cuenta, clave);
 
-		if (usuarioOpt.isEmpty()) {
-			model.addAttribute("alert", Alert.sweetAlertError("Cuenta o clave incorrecta"));
-			return "login";
-		}
+        if (usuarioOpt.isEmpty()) {
+            model.addAttribute("alert", Alert.sweetAlertError("Cuenta o clave incorrecta"));
+            return "login";
+        }
 
-		var usuario = usuarioOpt.get();
-		session.setAttribute("usuarioSesion", usuario);
+        var usuario = usuarioOpt.get();
 
-		if (usuario.getTipo().getIdTipo() == 1) {
-			return "redirect:/home";
-		}
-		return "redirect:/pedido/listado";
-	}
+        if (!usuario.getActivo()) {
+            model.addAttribute("alert", Alert.sweetAlertError("Tu cuenta estÃ¡ desactivada"));
+            return "login";
+        }
 
-	@GetMapping("/logout")
-	public String logout(HttpSession session) {
-		session.invalidate();
-		return "redirect:/";
-	}
+        session.setAttribute("usuarioSesion", usuario);
 
+        if (usuario.getTipo().getIdTipo() == 1) {
+            return "redirect:/home";
+        }
+
+        return "redirect:/pedido/listado";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
+    }
 }
