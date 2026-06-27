@@ -4,6 +4,8 @@ import org.hibernate.annotations.DynamicInsert;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -18,6 +20,7 @@ public class Tamanio {
 
 	@Id
 	@Column(name = "id_tamanio")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer idTamanio;
 	
 	@Column(name = "descripcion")

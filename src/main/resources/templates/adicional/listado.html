@@ -45,9 +45,10 @@
 									<i class="fa-solid fa-pen-to-square"></i>
 								</a>
 								<form th:action="@{/adicional/cambiar-estado/{id}(id=${adicional.idAdicional})}" method="post">
-									<button type="submit" class="btn btn-sm" th:classappend="${adicional.activo} ? 'btn-secondary' : 'btn-success'"
-										th:title="${adicional.activo} ? 'Desactivar' : 'Activar'">
-										<i class="fa-solid" th:classappend="${adicional.activo} ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+									<button type="submit" class="btn btn-sm" 
+									    th:classappend="${adicional.activo} ? 'btn-success' : 'btn-secondary'"
+									    th:title="${adicional.activo} ? 'Desactivar' : 'Activar'">
+									    <i class="fa-solid" th:classappend="${adicional.activo} ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
 									</button>
 								</form>
 								<form th:action="@{/adicional/eliminar/{id}(id=${adicional.idAdicional})}" method="post" class="form-eliminar">

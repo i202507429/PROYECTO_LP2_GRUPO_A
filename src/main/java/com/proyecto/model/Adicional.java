@@ -36,4 +36,6 @@ public class Adicional {
 	@Column(name = "activo")
 	private Boolean activo;
 	
+	@Column(name = "imagen", length = 500)
+	private String imagen;
 }

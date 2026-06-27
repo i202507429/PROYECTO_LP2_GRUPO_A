@@ -18,6 +18,44 @@
 			</a>
 		</div>
 
+		<!-- FILTROS -->
+		<div class="card shadow-sm mb-3">
+			<div class="card-body">
+				<form method="get" action="/pizza-tamanio/listado" class="row g-2 align-items-end">
+					<div class="col-md-4">
+						<label class="form-label mb-1">Pizza</label>
+						<select name="idPizza" class="form-select">
+							<option value="">-- Todas --</option>
+							<option th:each="p : ${lstPizzas}"
+									th:value="${p.idPizza}"
+									th:text="${p.nombre}"
+									th:selected="${p.idPizza == idPizzaSeleccionado}">
+							</option>
+						</select>
+					</div>
+					<div class="col-md-4">
+						<label class="form-label mb-1">Tamaño</label>
+						<select name="idTamanio" class="form-select">
+							<option value="">-- Todos --</option>
+							<option th:each="t : ${lstTamanios}"
+									th:value="${t.idTamanio}"
+									th:text="${t.descripcion}"
+									th:selected="${t.idTamanio == idTamanioSeleccionado}">
+							</option>
+						</select>
+					</div>
+					<div class="col-md-4 d-flex gap-2">
+						<button type="submit" class="btn btn-secondary w-100">
+							<i class="fa-solid fa-magnifying-glass me-1"></i>Filtrar
+						</button>
+						<a href="/pizza-tamanio/listado" class="btn btn-outline-secondary w-100">
+							<i class="fa-solid fa-rotate-left me-1"></i>Limpiar
+						</a>
+					</div>
+				</form>
+			</div>
+		</div>
+
 		<div class="card shadow-sm">
 			<div class="card-body">
 				<table class="table table-hover align-middle mb-0">
@@ -31,6 +69,9 @@
 						</tr>
 					</thead>
 					<tbody>
+						<tr th:if="${#lists.isEmpty(lstPizzaTamanios)}">
+							<td colspan="5" class="text-center text-muted">No se encontraron registros</td>
+						</tr>
 						<tr th:each="pt : ${lstPizzaTamanios}">
 							<td th:text="${pt.idPizzaTamanio}"></td>
 							<td th:text="${pt.pizza.nombre}"></td>

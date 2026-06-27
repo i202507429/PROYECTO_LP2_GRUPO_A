@@ -21,7 +21,6 @@
 			<button type="button" class="btn btn-outline-secondary filter-btn" data-filter="pendiente">Pendiente</button>
 			<button type="button" class="btn btn-outline-warning filter-btn" data-filter="preparando">Preparando</button>
 			<button type="button" class="btn btn-outline-success filter-btn" data-filter="listo">Listo</button>
-			<button type="button" class="btn btn-outline-primary filter-btn" data-filter="pagado">Pagado</button>
 		</div>
 
 		<div class="card shadow-sm">
@@ -57,12 +56,14 @@
 								<a th:href="@{/pedido/detalle/{id}(id=${pedido.idPedido})}" class="btn btn-sm btn-info text-white">
 									<i class="fa-solid fa-eye"></i>
 								</a>
+								<a th:href="@{/reporte/pedido(numPedido=${pedido.idPedido})}" target="_blank" class="btn btn-sm btn-danger" title="Ver comprobante PDF">
+									<i class="fa-solid fa-file-pdf"></i>
+								</a>
 								<form th:action="@{/pedido/cambiar-estado/{id}(id=${pedido.idPedido})}" method="post" class="d-flex gap-1">
 									<select name="estado" class="form-select form-select-sm" style="width: auto;">
-										<option value="pendiente" th:selected="${pedido.estado == 'pendiente'}">Pendiente</option>
-										<option value="preparando" th:selected="${pedido.estado == 'preparando'}">Preparando</option>
-										<option value="listo" th:selected="${pedido.estado == 'listo'}">Listo</option>
-										<option value="pagado" th:selected="${pedido.estado == 'pagado'}">Pagado</option>
+									    <option value="pendiente" th:selected="${pedido.estado == 'pendiente'}">Pendiente</option>
+									    <option value="preparando" th:selected="${pedido.estado == 'preparando'}">Preparando</option>
+									    <option value="listo" th:selected="${pedido.estado == 'listo'}">Listo</option>
 									</select>
 									<button type="submit" class="btn btn-sm btn-warning">
 										<i class="fa-solid fa-rotate"></i>

@@ -2,92 +2,141 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{fragments :: head}">
-	<title>Listado de Pizzas</title>
+    <title>Listado de Pizzas</title>
 </head>
 
 <body class="bg-light">
 
-	<div th:replace="~{fragments :: navbar}"></div>
+    <div th:replace="~{fragments :: navbar}"></div>
 
-	<div class="container py-4">
+    <div class="container py-4">
 
-		<div class="d-flex justify-content-between align-items-center mb-4">
-			<h2><i class="fa-solid fa-pizza-slice me-2"></i>Pizzas</h2>
-			<a href="/pizza/nuevo" class="btn btn-primary">
-				<i class="fa-solid fa-plus me-1"></i>Nueva Pizza
-			</a>
-		</div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fa-solid fa-pizza-slice me-2"></i>Pizzas</h2>
+            <a href="/pizza/nuevo" class="btn btn-primary">
+                <i class="fa-solid fa-plus me-1"></i>Nueva Pizza
+            </a>
+        </div>
 
-		<div class="card shadow-sm">
-			<div class="card-body">
-				<table class="table table-hover align-middle mb-0">
-					<thead class="table-dark">
-						<tr>
-							<th>#</th>
-							<th>Nombre</th>
-							<th>Descripción</th>
-							<th>Estado</th>
-							<th>Acciones</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="pizza : ${lstPizzas}">
-							<td th:text="${pizza.idPizza}"></td>
-							<td th:text="${pizza.nombre}"></td>
-							<td th:text="${pizza.descripcion}"></td>
-							<td>
-								<span th:classappend="${pizza.activo} ? 'badge bg-success' : 'badge bg-danger'"
-									th:text="${pizza.activo} ? 'Activo' : 'Inactivo'">
-								</span>
-							</td>
-							<td class="d-flex gap-1">
-								<a th:href="@{/pizza/edicion/{id}(id=${pizza.idPizza})}" class="btn btn-sm btn-warning">
-									<i class="fa-solid fa-pen-to-square"></i>
-								</a>
-								<form th:action="@{/pizza/cambiar-estado/{id}(id=${pizza.idPizza})}" method="post">
+        <!-- FILTROS -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <form method="get" action="/pizza/listado" class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label mb-1">Nombre</label>
+                        <input type="text" name="nombre" class="form-control"
+                               placeholder="Buscar por nombre..."
+                               th:value="${nombreFiltro}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1">Categoría</label>
+                        <select name="idCategoria" class="form-select">
+                            <option value="">-- Todas --</option>
+                            <option th:each="cat : ${lstCategorias}"
+                                    th:value="${cat.idCategoria}"
+                                    th:text="${cat.nombre}"
+                                    th:selected="${cat.idCategoria == categoriaFiltro}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1">Estado</label>
+                        <select name="activo" class="form-select">
+                            <option value="">-- Todos --</option>
+                            <option value="true"  th:selected="${activoFiltro == 'true'}">Activo</option>
+                            <option value="false" th:selected="${activoFiltro == 'false'}">Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-secondary w-100">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i>Filtrar
+                        </button>
+                        <a href="/pizza/listado" class="btn btn-outline-secondary w-100">
+                            <i class="fa-solid fa-rotate-left me-1"></i>Limpiar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(lstPizzas)}">
+                            <td colspan="6" class="text-center text-muted">No se encontraron registros</td>
+                        </tr>
+                        <tr th:each="pizza : ${lstPizzas}">
+                            <td th:text="${pizza.idPizza}"></td>
+                            <td th:text="${pizza.nombre}"></td>
+                            <td>
+                                <span class="badge bg-info text-dark"
+                                      th:text="${pizza.categoria != null ? pizza.categoria.nombre : '-'}">
+                                </span>
+                            </td>
+                            <td th:text="${pizza.descripcion}"></td>
+                            <td>
+                                <span th:classappend="${pizza.activo} ? 'badge bg-success' : 'badge bg-danger'"
+                                      th:text="${pizza.activo} ? 'Activo' : 'Inactivo'">
+                                </span>
+                            </td>
+                            <td class="d-flex gap-1">
+                                <a th:href="@{/pizza/edicion/{id}(id=${pizza.idPizza})}" class="btn btn-sm btn-warning">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <form th:action="@{/pizza/cambiar-estado/{id}(id=${pizza.idPizza})}" method="post">
 									<button type="submit" class="btn btn-sm"
-										th:classappend="${pizza.activo} ? 'btn-secondary' : 'btn-success'"
-										th:title="${pizza.activo} ? 'Desactivar' : 'Activar'">
-										<i class="fa-solid"
-											th:classappend="${pizza.activo} ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+									    th:classappend="${pizza.activo} ? 'btn-success' : 'btn-secondary'"
+									    th:title="${pizza.activo} ? 'Desactivar' : 'Activar'">
+									    <i class="fa-solid"
+									       th:classappend="${pizza.activo} ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
 									</button>
-								</form>
-								<form th:action="@{/pizza/eliminar/{id}(id=${pizza.idPizza})}" method="post"
-									class="form-eliminar">
-									<button type="submit" class="btn btn-sm btn-danger">
-										<i class="fa-solid fa-trash"></i>
-									</button>
-								</form>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
+                                </form>
+                                <form th:action="@{/pizza/eliminar/{id}(id=${pizza.idPizza})}" method="post"
+                                      class="form-eliminar">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-	</div>
+    </div>
 
-	<div th:if="${toast}" th:utext="${toast}"></div>
+    <div th:if="${toast}" th:utext="${toast}"></div>
 
-	<script>
-		document.querySelectorAll('.form-eliminar').forEach(function (form) {
-			form.addEventListener('submit', function (e) {
-				e.preventDefault();
-				Swal.fire({
-					title: '¿Eliminar?',
-					text: 'Esta acción no se puede deshacer',
-					icon: 'warning',
-					showCancelButton: true,
-					confirmButtonText: 'Sí, eliminar',
-					cancelButtonText: 'Cancelar',
-					confirmButtonColor: '#dc3545'
-				}).then(function (result) {
-					if (result.isConfirmed) form.submit();
-				});
-			});
-		});
-	</script>
+    <script>
+        document.querySelectorAll('.form-eliminar').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: '¿Eliminar?',
+                    text: 'Esta acción no se puede deshacer',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#dc3545'
+                }).then(function (result) {
+                    if (result.isConfirmed) form.submit();
+                });
+            });
+        });
+    </script>
 
 </body>
-
 </html>

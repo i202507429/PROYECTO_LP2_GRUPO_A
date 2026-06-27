@@ -84,7 +84,8 @@ public class TamanioController {
 	@PostMapping("eliminar/{id}")
 	public String eliminar(@PathVariable Integer id, RedirectAttributes flash) {
 		var response = tamanioService.eliminar(id);
-		flash.addFlashAttribute("toast", Alert.sweetToast(response.mensaje(), response.success() ? "success" : "error", 5000));
+		flash.addFlashAttribute("modalEliminacion", response.mensaje());
+		flash.addFlashAttribute("modalTipo", response.success() ? "success" : "error");
 		return "redirect:/tamanio/listado";
 	}
 

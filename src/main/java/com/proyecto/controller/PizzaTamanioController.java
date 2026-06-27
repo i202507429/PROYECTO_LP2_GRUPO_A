@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.proyecto.model.PizzaTamanio;
@@ -27,8 +28,22 @@ public class PizzaTamanioController {
 	private final TamanioService tamanioService;
 
 	@GetMapping("listado")
-	public String listado(Model model) {
-		model.addAttribute("lstPizzaTamanios", pizzaTamanioService.listar());
+	public String listado(
+			@RequestParam(required = false) Integer idPizza,
+			@RequestParam(required = false) Integer idTamanio,
+			Model model) {
+
+		// Filtramos en memoria según los parámetros recibidos
+		var lista = pizzaTamanioService.listar().stream()
+				.filter(pt -> idPizza   == null || pt.getPizza().getIdPizza().equals(idPizza))
+				.filter(pt -> idTamanio == null || pt.getTamanio().getIdTamanio().equals(idTamanio))
+				.toList();
+
+		model.addAttribute("lstPizzaTamanios", lista);
+		model.addAttribute("lstPizzas", pizzaService.listar());
+		model.addAttribute("lstTamanios", tamanioService.listar());
+		model.addAttribute("idPizzaSeleccionado", idPizza);
+		model.addAttribute("idTamanioSeleccionado", idTamanio);
 		return "pizza_tamanio/listado";
 	}
 
@@ -46,7 +61,6 @@ public class PizzaTamanioController {
 			Model model,
 			RedirectAttributes flash) {
 		var response = pizzaTamanioService.create(pizzaTamanio);
-
 		if (!response.success()) {
 			model.addAttribute("pizzaTamanio", pizzaTamanio);
 			model.addAttribute("lstPizzas", pizzaService.listar());
@@ -54,7 +68,6 @@ public class PizzaTamanioController {
 			model.addAttribute("alert", Alert.sweetAlertError(response.mensaje()));
 			return "pizza_tamanio/nuevo";
 		}
-
 		flash.addFlashAttribute("toast", Alert.sweetToast(response.mensaje(), "success", 5000));
 		return "redirect:/pizza-tamanio/listado";
 	}
@@ -73,7 +86,6 @@ public class PizzaTamanioController {
 			Model model,
 			RedirectAttributes flash) {
 		var response = pizzaTamanioService.update(pizzaTamanio);
-
 		if (!response.success()) {
 			model.addAttribute("pizzaTamanio", pizzaTamanio);
 			model.addAttribute("lstPizzas", pizzaService.listar());
@@ -81,9 +93,7 @@ public class PizzaTamanioController {
 			model.addAttribute("alert", Alert.sweetAlertError(response.mensaje()));
 			return "pizza_tamanio/edicion";
 		}
-
 		flash.addFlashAttribute("toast", Alert.sweetToast(response.mensaje(), "success", 5000));
 		return "redirect:/pizza-tamanio/listado";
 	}
-
 }

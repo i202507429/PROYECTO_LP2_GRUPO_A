@@ -16,16 +16,26 @@ public class PizzaTamanioService {
 
 	private final PizzaTamanioRepository pizzaTamanioRepository;
 
-	
 	public List<PizzaTamanio> listar() {
 		return pizzaTamanioRepository.findAll();
 	}
 
+	public List<PizzaTamanio> listarPorPizza(Integer idPizza) {
+		return pizzaTamanioRepository.findByPizzaIdPizza(idPizza);
+	}
+
 	public ResultadoResponse create(PizzaTamanio pizzaTamanio) {
+		boolean existe = pizzaTamanioRepository.existsByPizzaIdPizzaAndTamanioIdTamanio(
+				pizzaTamanio.getPizza().getIdPizza(),
+				pizzaTamanio.getTamanio().getIdTamanio());
+
+		if (existe) {
+			return new ResultadoResponse(false, "Ya existe un precio para esa combinación de Pizza + Tamaño");
+		}
+
 		try {
 			var registro = pizzaTamanioRepository.save(pizzaTamanio);
-			var mensaje = String.format("Registro con ID %s creado", registro.getIdPizzaTamanio());
-			return new ResultadoResponse(true, mensaje);
+			return new ResultadoResponse(true, String.format("Registro con ID %s creado", registro.getIdPizzaTamanio()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResultadoResponse(false, "Hubo un error en la transacción");
@@ -37,14 +47,21 @@ public class PizzaTamanioService {
 	}
 
 	public ResultadoResponse update(PizzaTamanio pizzaTamanio) {
+		boolean existe = pizzaTamanioRepository.existsByPizzaIdPizzaAndTamanioIdTamanioAndIdPizzaTamanioNot(
+				pizzaTamanio.getPizza().getIdPizza(),
+				pizzaTamanio.getTamanio().getIdTamanio(),
+				pizzaTamanio.getIdPizzaTamanio());
+
+		if (existe) {
+			return new ResultadoResponse(false, "Ya existe un precio para esa combinación de Pizza + Tamaño");
+		}
+
 		try {
 			var registro = pizzaTamanioRepository.save(pizzaTamanio);
-			var mensaje = String.format("Registro con ID %s actualizado", registro.getIdPizzaTamanio());
-			return new ResultadoResponse(true, mensaje);
+			return new ResultadoResponse(true, String.format("Registro con ID %s actualizado", registro.getIdPizzaTamanio()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResultadoResponse(false, "Hubo un error en la transacción");
 		}
 	}
-
 }

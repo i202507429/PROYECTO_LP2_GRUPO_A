@@ -12,7 +12,8 @@
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 
 	<!-- SweetAlert2 -->
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.10.6/sweetalert2.min.css" rel="stylesheet" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.10.6/sweetalert2.min.css"
+		rel="stylesheet" />
 
 	<!-- jQuery -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -22,60 +23,372 @@
 
 	<!-- SweetAlert2 JS -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.10.6/sweetalert2.min.js"></script>
+
+	<style>
+		:root {
+			--sidebar-width: 270px;
+			--sidebar-width-collapsed: 76px;
+		}
+
+		body {
+		    min-height: 100vh;
+		    transition: margin-left .25s ease;
+		}
+
+		body.has-sidebar {
+		    margin-left: var(--sidebar-width);
+		}
+
+		body.has-sidebar.sidebar-collapsed {
+		    margin-left: var(--sidebar-width-collapsed);
+		}
+
+		.sidebar {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: var(--sidebar-width);
+			height: 100vh;
+			background: linear-gradient(180deg, #1a1d23 0%, #14161a 100%);
+			display: flex;
+			flex-direction: column;
+			z-index: 1040;
+			box-shadow: 2px 0 12px rgba(0, 0, 0, .25);
+			transition: width .25s ease, transform .25s ease;
+		}
+
+		.sidebar.collapsed {
+			width: var(--sidebar-width-collapsed);
+		}
+
+		.sidebar-brand {
+			display: flex;
+			align-items: center;
+			gap: .6rem;
+			padding: 1.3rem 1.4rem;
+			color: #fff;
+			font-weight: 700;
+			font-size: 1.15rem;
+			text-decoration: none;
+			border-bottom: 1px solid rgba(255, 255, 255, .08);
+			white-space: nowrap;
+		}
+
+		.sidebar-brand i {
+			color: #ff4d4d;
+			font-size: 1.4rem;
+			flex: 0 0 auto;
+		}
+
+		.sidebar.collapsed .sidebar-brand span,
+		.sidebar.collapsed .sidebar-section-title,
+		.sidebar.collapsed .sidebar-link span,
+		.sidebar.collapsed .user-info {
+			display: none;
+		}
+
+		.sidebar.collapsed .sidebar-brand {
+			justify-content: center;
+			padding: 1.3rem .5rem;
+		}
+
+		.sidebar.collapsed .sidebar-link {
+			justify-content: center;
+			padding: .75rem .5rem;
+		}
+
+		.sidebar.collapsed .sidebar-footer {
+			justify-content: center;
+		}
+
+		.sidebar-collapse-btn {
+			position: absolute;
+			top: 1.35rem;
+			right: -14px;
+			width: 28px;
+			height: 28px;
+			border-radius: 50%;
+			border: 2px solid #14161a;
+			background: #2a2e36;
+			color: #fff;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: .7rem;
+			cursor: pointer;
+			z-index: 1041;
+			transition: transform .25s ease, background .15s;
+		}
+
+		.sidebar-collapse-btn:hover {
+			background: #ff4d4d;
+		}
+
+		.sidebar.collapsed .sidebar-collapse-btn i {
+			transform: rotate(180deg);
+		}
+
+		.sidebar-section-title {
+			text-transform: uppercase;
+			font-size: .7rem;
+			letter-spacing: .08em;
+			color: #6c7280;
+			padding: 1rem 1.4rem .4rem;
+			font-weight: 700;
+			white-space: nowrap;
+		}
+
+		.sidebar-nav {
+			flex: 1 1 auto;
+			overflow-y: auto;
+			padding-bottom: 1rem;
+		}
+
+		.sidebar-link {
+			display: flex;
+			align-items: center;
+			gap: .8rem;
+			padding: .65rem 1.4rem;
+			color: #b9bdc7;
+			text-decoration: none;
+			font-size: .92rem;
+			border-left: 3px solid transparent;
+			transition: background .15s, color .15s, border-color .15s;
+			white-space: nowrap;
+		}
+
+		.sidebar-link i {
+			width: 1.1rem;
+			text-align: center;
+			font-size: .95rem;
+			flex: 0 0 auto;
+		}
+
+		.sidebar-link:hover {
+			background: rgba(255, 255, 255, .06);
+			color: #fff;
+		}
+
+		.sidebar-footer {
+			border-top: 1px solid rgba(255, 255, 255, .08);
+			padding: 1rem 1.4rem;
+			display: flex;
+			align-items: center;
+			gap: .7rem;
+		}
+
+		.sidebar-footer .user-info {
+			flex: 1 1 auto;
+			overflow: hidden;
+		}
+
+		.sidebar-footer .user-info small {
+			color: #6c7280;
+			display: block;
+		}
+
+		.sidebar-footer .user-name {
+			color: #fff;
+			font-size: .85rem;
+			font-weight: 600;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.sidebar-footer a {
+			color: #b9bdc7;
+			font-size: 1.05rem;
+			flex: 0 0 auto;
+		}
+
+		.sidebar-footer a:hover {
+			color: #dc3545;
+		}
+
+		.sidebar-toggle-btn {
+			display: none;
+			position: fixed;
+			top: 14px;
+			left: 14px;
+			z-index: 1050;
+			width: 42px;
+			height: 42px;
+			border-radius: 10px;
+			border: none;
+			background: #1a1d23;
+			color: #fff;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+		}
+
+		.sidebar-overlay {
+			display: none;
+			position: fixed;
+			inset: 0;
+			background: rgba(0, 0, 0, .4);
+			z-index: 1030;
+		}
+
+		@media (max-width: 991.98px) {
+		    body.has-sidebar, body.has-sidebar.sidebar-collapsed {
+		        margin-left: 0;
+		    }
+
+			.sidebar,
+			.sidebar.collapsed {
+				width: var(--sidebar-width);
+				transform: translateX(-100%);
+			}
+
+			.sidebar.show {
+				transform: translateX(0);
+			}
+
+			.sidebar.collapsed .sidebar-brand span,
+			.sidebar.collapsed .sidebar-section-title,
+			.sidebar.collapsed .sidebar-link span,
+			.sidebar.collapsed .user-info {
+				display: revert;
+			}
+
+			.sidebar.collapsed .sidebar-link,
+			.sidebar.collapsed .sidebar-brand,
+			.sidebar.collapsed .sidebar-footer {
+				justify-content: flex-start;
+				padding-left: 1.4rem;
+			}
+
+			.sidebar-collapse-btn {
+				display: none;
+			}
+
+			.sidebar-toggle-btn {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.sidebar-overlay.show {
+				display: block;
+			}
+		}
+	</style>
 </head>
 
 <body>
-	<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
-		<div class="container">
-			<a class="navbar-brand fw-bold" href="/home">
-				<i class="fa-solid fa-pizza-slice me-2"></i>Pizzería
-			</a>
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-				<span class="navbar-toggler-icon"></span>
+	<div th:fragment="navbar">
+
+		<button class="sidebar-toggle-btn" id="sidebarToggleBtn" type="button">
+			<i class="fa-solid fa-bars"></i>
+		</button>
+
+		<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+		<aside class="sidebar" id="sidebarMenu">
+
+			<button class="sidebar-collapse-btn" id="sidebarCollapseBtn" type="button" title="Colapsar menú">
+				<i class="fa-solid fa-chevron-left"></i>
 			</button>
-			<div class="collapse navbar-collapse" id="navMenu">
-				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-					<!-- Solo visible para administradores -->
-					<li class="nav-item" th:if="${session.usuarioSesion != null and session.usuarioSesion.tipo.idTipo == 1}">
-						<a class="nav-link" href="/home"><i class="fa-solid fa-house me-1"></i>Inicio</a>
-					</li>
+			<a class="sidebar-brand" href="/home">
+				<i class="fa-solid fa-pizza-slice"></i>
+				<span>Pizzería</span>
+			</a>
 
-					<!-- Solo visible para administradores -->
-					<li class="nav-item dropdown" th:if="${session.usuarioSesion != null and session.usuarioSesion.tipo.idTipo == 1}">
-						<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-							<i class="fa-solid fa-gear me-1"></i>Mantenimiento
-						</a>
-						<ul class="dropdown-menu">
-							<li><a class="dropdown-item" href="/pizza/listado"><i class="fa-solid fa-pizza-slice me-2"></i>Pizzas</a></li>
-							<li><a class="dropdown-item" href="/tamanio/listado"><i class="fa-solid fa-ruler me-2"></i>Tamaños</a></li>
-							<li><a class="dropdown-item" href="/pizza-tamanio/listado"><i class="fa-solid fa-tags me-2"></i>Pizza-Tamaño</a></li>
-							<li><a class="dropdown-item" href="/adicional/listado"><i class="fa-solid fa-plus-circle me-2"></i>Adicionales</a></li>
-							<li><hr class="dropdown-divider"></li>
-							<li><a class="dropdown-item" href="/usuario/listado"><i class="fa-solid fa-users me-2"></i>Usuarios</a></li>
-						</ul>
-					</li>
+			<nav class="sidebar-nav">
 
-					<li class="nav-item">
-						<a class="nav-link" href="/pedido/listado"><i class="fa-solid fa-clipboard-list me-1"></i>Pedidos</a>
-					</li>
-				</ul>
+				<!-- Solo visible para administradores -->
+				<div th:if="${session.usuarioSesion != null and session.usuarioSesion.tipo.idTipo == 1}">
+					<a class="sidebar-link" href="/home" title="Inicio"><i
+							class="fa-solid fa-house"></i><span>Inicio</span></a>
 
-				<!-- Usuario logueado + logout (visible para TODOS los logueados) -->
-				<ul class="navbar-nav ms-auto mb-2 mb-lg-0" th:if="${session.usuarioSesion != null}">
-					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-							<i class="fa-solid fa-user me-1"></i>
-							<span th:text="${session.usuarioSesion.nombres + ' ' + session.usuarioSesion.apellidos}">Usuario</span>
-						</a>
-						<ul class="dropdown-menu dropdown-menu-end">
-							<li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar sesión</a></li>
-						</ul>
-					</li>
-				</ul>
+					<div class="sidebar-section-title">Mantenimiento</div>
+					<a class="sidebar-link" href="/pizza/listado" title="Pizzas"><i
+							class="fa-solid fa-pizza-slice"></i><span>Pizzas</span></a>
+					<a class="sidebar-link" href="/tamanio/listado" title="Tamaños"><i
+							class="fa-solid fa-ruler"></i><span>Tamaños</span></a>
+					<a class="sidebar-link" href="/pizza-tamanio/listado" title="Pizza-Tamaño"><i
+							class="fa-solid fa-tags"></i><span>Pizza-Tamaño</span></a>
+					<a class="sidebar-link" href="/adicional/listado" title="Adicionales"><i
+							class="fa-solid fa-plus-circle"></i><span>Adicionales</span></a>
+					<a class="sidebar-link" href="/usuario/listado" title="Usuarios"><i
+							class="fa-solid fa-users"></i><span>Usuarios</span></a>
+				</div>
+
+				<div class="sidebar-section-title">Operación</div>
+				<a class="sidebar-link" href="/pedido/listado" title="Pedidos"><i
+						class="fa-solid fa-clipboard-list"></i><span>Pedidos</span></a>
+
+			</nav>
+
+			<div class="sidebar-footer" th:if="${session.usuarioSesion != null}">
+				<i class="fa-solid fa-circle-user fa-lg" style="color:#b9bdc7;"></i>
+				<div class="user-info">
+					<span class="user-name"
+						th:text="${session.usuarioSesion.nombres + ' ' + session.usuarioSesion.apellidos}">Usuario</span>
+					<small th:text="${session.usuarioSesion.tipo.descripcion}">Tipo</small>
+				</div>
+				<a href="/logout" title="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></a>
 			</div>
-		</div>
-	</nav>
+
+		</aside>
+
+		<script>
+			(function () {
+				document.body.classList.add('has-sidebar');
+				
+				const toggleBtn = document.getElementById('sidebarToggleBtn');
+				const collapseBtn = document.getElementById('sidebarCollapseBtn');
+				const sidebar = document.getElementById('sidebarMenu');
+				const	 overlay = document.getElementById('sidebarOverlay');
+				const body = document.body;
+
+				// Mobile: mostrar/ocultar completamente
+				function closeMobileSidebar() {
+					sidebar.classList.remove('show');
+					overlay.classList.remove('show');
+				}
+
+				if (toggleBtn) {
+					toggleBtn.addEventListener('click', function () {
+						sidebar.classList.toggle('show');
+						overlay.classList.toggle('show');
+					});
+				}
+				if (overlay) {
+					overlay.addEventListener('click', closeMobileSidebar);
+				}
+
+				const COLLAPSE_KEY = 'sidebarCollapsed';
+				if (localStorage.getItem(COLLAPSE_KEY) === '1') {
+					sidebar.classList.add('collapsed');
+					body.classList.add('sidebar-collapsed');
+				}
+
+				if (collapseBtn) {
+					collapseBtn.addEventListener('click', function () {
+						const isCollapsed = sidebar.classList.toggle('collapsed');
+						body.classList.toggle('sidebar-collapsed', isCollapsed);
+						localStorage.setItem(COLLAPSE_KEY, isCollapsed ? '1' : '0');
+					});
+				}
+				document.addEventListener('keydown', function (e) {
+				    if (e.key === 'Escape') {
+				        if (window.innerWidth <= 991.98) {
+				            closeMobileSidebar();
+				        } else {
+				            if (!sidebar.classList.contains('collapsed')) {
+				                sidebar.classList.add('collapsed');
+				                body.classList.add('sidebar-collapsed');
+				                localStorage.setItem(COLLAPSE_KEY, '1');
+				            }
+				        }
+				    }
+				});
+			})();
+		</script>
+
+	</div>
 </body>
 
 </html>

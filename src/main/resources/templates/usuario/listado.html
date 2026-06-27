@@ -49,9 +49,10 @@
 									<i class="fa-solid fa-pen-to-square"></i>
 								</a>
 								<form th:action="@{/usuario/cambiar-estado/{id}(id=${usuario.idUsuario})}" method="post">
-									<button type="submit" class="btn btn-sm" th:classappend="${usuario.activo} ? 'btn-secondary' : 'btn-success'"
-										th:title="${usuario.activo} ? 'Desactivar' : 'Activar'">
-										<i class="fa-solid" th:classappend="${usuario.activo} ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+									<button type="submit" class="btn btn-sm" 
+									    th:classappend="${usuario.activo} ? 'btn-success' : 'btn-secondary'"
+									    th:title="${usuario.activo} ? 'Desactivar' : 'Activar'">
+									    <i class="fa-solid" th:classappend="${usuario.activo} ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
 									</button>
 								</form>
 								<form th:action="@{/usuario/eliminar/{id}(id=${usuario.idUsuario})}" method="post" class="form-eliminar">

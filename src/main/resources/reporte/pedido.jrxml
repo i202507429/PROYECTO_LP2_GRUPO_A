@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="pedido" pageWidth="595" pageHeight="842" columnWidth="555"
+              leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="1c2b3a4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d">
+
+    <style name="Table_TH" mode="Opaque" backcolor="#FDECEA">
+        <box>
+            <topPen lineWidth="1.5" lineColor="#DC3545"/>
+            <leftPen lineWidth="0.5" lineColor="#DC3545"/>
+            <bottomPen lineWidth="0.5" lineColor="#DC3545"/>
+            <rightPen lineWidth="0.5" lineColor="#DC3545"/>
+        </box>
+    </style>
+
+    <style name="Table_CH" mode="Opaque" backcolor="#DC3545" forecolor="#FFFFFF">
+        <box>
+            <topPen lineWidth="0.5" lineColor="#B02030"/>
+            <leftPen lineWidth="0.5" lineColor="#B02030"/>
+            <bottomPen lineWidth="0.5" lineColor="#B02030"/>
+            <rightPen lineWidth="0.5" lineColor="#B02030"/>
+        </box>
+    </style>
+
+    <style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+        <box>
+            <topPen lineWidth="0.5" lineColor="#EEEEEE"/>
+            <leftPen lineWidth="0.5" lineColor="#EEEEEE"/>
+            <bottomPen lineWidth="0.5" lineColor="#EEEEEE"/>
+            <rightPen lineWidth="0.5" lineColor="#EEEEEE"/>
+        </box>
+    </style>
+
+    <subDataset name="DatasetDetallePedido" uuid="2d3c4b5a-6f7e-4d8c-9b0a-1f2e3d4c5b6a">
+        <parameter name="pNumPedido" class="java.lang.Integer"/>
+        <queryString language="SQL">
+            <![CDATA[
+SELECT CONCAT(pz.nombre, ' (', t.descripcion, ')') AS descripcion,
+       dp.cantidad AS cantidad,
+       dp.subtotal AS subtotal
+FROM tbl_detalle_pizza dp
+JOIN tbl_pizza_tamanio pt ON dp.id_pizza_tamanio = pt.id_pizza_tamanio
+JOIN tbl_pizza pz ON pt.id_pizza = pz.id_pizza
+JOIN tbl_tamanio t ON pt.id_tamanio = t.id_tamanio
+WHERE dp.id_pedido = $P{pNumPedido}
+UNION ALL
+SELECT a.descripcion AS descripcion,
+       da.cantidad AS cantidad,
+       da.subtotal AS subtotal
+FROM tbl_detalle_adicional da
+JOIN tbl_adicional a ON da.id_adicional = a.id_adicional
+WHERE da.id_pedido = $P{pNumPedido}
+            ]]>
+        </queryString>
+        <field name="descripcion" class="java.lang.String"/>
+        <field name="cantidad" class="java.lang.Integer"/>
+        <field name="subtotal" class="java.math.BigDecimal"/>
+        <variable name="vTotal" class="java.math.BigDecimal" calculation="Sum">
+            <variableExpression><![CDATA[$F{subtotal}]]></variableExpression>
+        </variable>
+    </subDataset>
+
+    <parameter name="pNumPedido" class="java.lang.Integer"/>
+    <parameter name="pLogo" class="java.lang.String"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT p.id_pedido,
+       CONCAT('PEDIDO N° ', LPAD(p.id_pedido, 6, '0')) AS numPedText,
+       COALESCE(p.nombre_cliente, 'Cliente Mostrador') AS nombreCliente,
+       CONCAT(u.nombres, ' ', u.apellidos) AS nombreUsuario,
+       DATE_FORMAT(p.fecha, '%d/%m/%Y %H:%i') AS fechaText,
+       p.estado AS estado,
+       COALESCE(p.metodo_pago, '-') AS metodoPago,
+       p.total AS total
+FROM tbl_pedido p
+JOIN tbl_usuario u ON p.id_usuario = u.id_usuario
+WHERE p.id_pedido = $P{pNumPedido}
+        ]]>
+    </queryString>
+
+    <field name="id_pedido" class="java.lang.Integer"/>
+    <field name="numPedText" class="java.lang.String"/>
+    <field name="nombreCliente" class="java.lang.String"/>
+    <field name="nombreUsuario" class="java.lang.String"/>
+    <field name="fechaText" class="java.lang.String"/>
+    <field name="estado" class="java.lang.String"/>
+    <field name="metodoPago" class="java.lang.String"/>
+    <field name="total" class="java.math.BigDecimal"/>
+
+    <!-- ══════════ TITLE ══════════ -->
+    <title>
+        <band height="75" splitType="Stretch">
+
+            <image scaleImage="RetainShape" hAlign="Left" vAlign="Middle">
+                <reportElement x="0" y="0" width="120" height="45" uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"/>
+                <imageExpression><![CDATA[$P{pLogo}]]></imageExpression>
+            </image>
+
+            <staticText>
+                <reportElement mode="Opaque" x="125" y="0" width="430" height="45"
+                               backcolor="#DC3545" forecolor="#FFFFFF"
+                               uuid="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <text><![CDATA[COMPROBANTE DE PEDIDO]]></text>
+            </staticText>
+
+            <line>
+                <reportElement x="0" y="50" width="555" height="1"
+                               forecolor="#DC3545" uuid="cccccccc-cccc-cccc-cccc-cccccccccccc"/>
+                <graphicElement>
+                    <pen lineWidth="1.5"/>
+                </graphicElement>
+            </line>
+
+            <textField>
+                <reportElement x="0" y="55" width="555" height="18"
+                               uuid="dddddddd-dddd-dddd-dddd-dddddddddddd"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{numPedText}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <!-- ══════════ PAGE HEADER ══════════ -->
+    <pageHeader>
+	    <band height="50" splitType="Stretch">
+	
+	        <rectangle radius="4">
+	            <reportElement x="0" y="0" width="555" height="45"
+	                           backcolor="#FFF8F8" forecolor="#DC3545"
+	                           uuid="eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"/>
+	            <graphicElement>
+	                <pen lineWidth="1.0" lineColor="#DC3545"/>
+	            </graphicElement>
+	        </rectangle>
+	
+	        <staticText>
+	            <reportElement x="8" y="6" width="90" height="17" uuid="11111111-aaaa-aaaa-aaaa-111111111111"/>
+	            <textElement verticalAlignment="Middle"><font size="10" isBold="true"/></textElement>
+	            <text><![CDATA[Cliente:]]></text>
+	        </staticText>
+	        <textField>
+	            <reportElement x="98" y="6" width="449" height="17" uuid="22222222-aaaa-aaaa-aaaa-222222222222"/>
+	            <textElement verticalAlignment="Middle"><font size="10"/></textElement>
+	            <textFieldExpression><![CDATA[$F{nombreCliente}]]></textFieldExpression>
+	        </textField>
+	
+	        <staticText>
+	            <reportElement x="8" y="25" width="90" height="17" uuid="55555555-aaaa-aaaa-aaaa-555555555555"/>
+	            <textElement verticalAlignment="Middle"><font size="10" isBold="true"/></textElement>
+	            <text><![CDATA[Fecha:]]></text>
+	        </staticText>
+	        <textField>
+	            <reportElement x="98" y="25" width="180" height="17" uuid="66666666-aaaa-aaaa-aaaa-666666666666"/>
+	            <textElement verticalAlignment="Middle"><font size="10"/></textElement>
+	            <textFieldExpression><![CDATA[$F{fechaText}]]></textFieldExpression>
+	        </textField>
+	
+	        <staticText>
+	            <reportElement x="300" y="25" width="110" height="17" uuid="77777777-aaaa-aaaa-aaaa-777777777777"/>
+	            <textElement verticalAlignment="Middle"><font size="10" isBold="true"/></textElement>
+	            <text><![CDATA[Método de pago:]]></text>
+	        </staticText>
+	        <textField>
+	            <reportElement x="410" y="25" width="137" height="17" uuid="88888888-aaaa-aaaa-aaaa-888888888888"/>
+	            <textElement verticalAlignment="Middle"><font size="10"/></textElement>
+	            <textFieldExpression><![CDATA[$F{metodoPago}]]></textFieldExpression>
+	        </textField>
+	
+	    </band>
+	</pageHeader>
+
+    <!-- ══════════ DETAIL ══════════ -->
+    <detail>
+        <band height="110" splitType="Stretch">
+            <componentElement>
+                <reportElement x="0" y="5" width="555" height="100" uuid="99999999-aaaa-aaaa-aaaa-999999999999"/>
+                <jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components"
+                          xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+                    <datasetRun subDataset="DatasetDetallePedido" uuid="aaaaaaaa-bbbb-bbbb-bbbb-aaaaaaaaaaaa">
+                        <datasetParameter name="pNumPedido">
+                            <datasetParameterExpression><![CDATA[$P{pNumPedido}]]></datasetParameterExpression>
+                        </datasetParameter>
+                        <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                    </datasetRun>
+
+                    <jr:column width="295" uuid="bbbbbbbb-cccc-cccc-cccc-bbbbbbbbbbbb">
+                        <jr:tableFooter style="Table_TH" height="30" rowSpan="1">
+                            <staticText>
+                                <reportElement x="0" y="0" width="295" height="30" uuid="cccccccc-dddd-dddd-dddd-cccccccccccc"/>
+                                <box padding="6"/>
+                                <textElement textAlignment="Right" verticalAlignment="Middle">
+                                    <font size="11" isBold="true"/>
+                                </textElement>
+                                <text><![CDATA[TOTAL A PAGAR]]></text>
+                            </staticText>
+                        </jr:tableFooter>
+                        <jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+                            <staticText>
+                                <reportElement x="0" y="0" width="295" height="30" uuid="dddddddd-eeee-eeee-eeee-dddddddddddd"/>
+                                <box padding="6"/>
+                                <textElement textAlignment="Left" verticalAlignment="Middle">
+                                    <font isBold="true" size="10"/>
+                                </textElement>
+                                <text><![CDATA[Descripción]]></text>
+                            </staticText>
+                        </jr:columnHeader>
+                        <jr:detailCell style="Table_TD" height="28">
+                            <textField>
+                                <reportElement x="0" y="0" width="295" height="28" uuid="eeeeeeee-ffff-ffff-ffff-eeeeeeeeeeee"/>
+                                <box padding="6"/>
+                                <textElement verticalAlignment="Middle"><font size="10"/></textElement>
+                                <textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
+                            </textField>
+                        </jr:detailCell>
+                    </jr:column>
+
+                    <jr:column width="100" uuid="ffffffff-aaaa-aaaa-aaaa-ffffffffffff">
+                        <jr:tableFooter style="Table_TH" height="30" rowSpan="1"/>
+                        <jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+                            <staticText>
+                                <reportElement x="0" y="0" width="100" height="30" uuid="aaaaaaaa-1111-1111-1111-aaaaaaaaaaab"/>
+                                <box padding="6"/>
+                                <textElement textAlignment="Center" verticalAlignment="Middle">
+                                    <font isBold="true" size="10"/>
+                                </textElement>
+                                <text><![CDATA[Cantidad]]></text>
+                            </staticText>
+                        </jr:columnHeader>
+                        <jr:detailCell style="Table_TD" height="28">
+                            <textField>
+                                <reportElement x="0" y="0" width="100" height="28" uuid="bbbbbbbb-2222-2222-2222-bbbbbbbbbbb0"/>
+                                <box padding="6"/>
+                                <textElement textAlignment="Center" verticalAlignment="Middle">
+                                    <font size="10"/>
+                                </textElement>
+                                <textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+                            </textField>
+                        </jr:detailCell>
+                    </jr:column>
+
+                    <jr:column width="160" uuid="cccccccc-3333-3333-3333-ccccccccccca">
+                        <jr:tableFooter style="Table_TH" height="30" rowSpan="1">
+                            <textField pattern="'S/' #,##0.00">
+                                <reportElement x="0" y="0" width="160" height="30" uuid="dddddddd-4444-4444-4444-ddddddddddd0"/>
+                                <box padding="6"/>
+                                <textElement textAlignment="Right" verticalAlignment="Middle">
+                                    <font size="12" isBold="true"/>
+                                </textElement>
+                                <textFieldExpression><![CDATA[$V{vTotal}]]></textFieldExpression>
+                            </textField>
+                        </jr:tableFooter>
+                        <jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+                            <staticText>
+                                <reportElement x="0" y="0" width="160" height="30" uuid="eeeeeeee-5555-5555-5555-eeeeeeeeeee0"/>
+                                <box padding="6"/>
+                                <textElement textAlignment="Right" verticalAlignment="Middle">
+                                    <font isBold="true" size="10"/>
+                                </textElement>
+                                <text><![CDATA[Subtotal]]></text>
+                            </staticText>
+                        </jr:columnHeader>
+                        <jr:detailCell style="Table_TD" height="28">
+                            <textField pattern="'S/' #,##0.00">
+                                <reportElement x="0" y="0" width="160" height="28" uuid="ffffffff-6666-6666-6666-fffffffffffe"/>
+                                <box padding="6"/>
+                                <textElement textAlignment="Right" verticalAlignment="Middle">
+                                    <font size="10"/>
+                                </textElement>
+                                <textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
+                            </textField>
+                        </jr:detailCell>
+                    </jr:column>
+                </jr:table>
+            </componentElement>
+        </band>
+    </detail>
+
+    <!-- ══════════ PAGE FOOTER ══════════ -->
+    <pageFooter>
+        <band height="35" splitType="Stretch">
+            <line>
+                <reportElement x="0" y="0" width="555" height="1"
+                               forecolor="#DC3545" uuid="aaaaaaaa-7777-7777-7777-aaaaaaaaaaa0"/>
+                <graphicElement><pen lineWidth="1.0"/></graphicElement>
+            </line>
+            <staticText>
+                <reportElement x="0" y="5" width="555" height="28" uuid="bbbbbbbb-8888-8888-8888-bbbbbbbbbbb0"/>
+                <box padding="3"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="8" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[Gracias por su compra - Pizzería © 2026. Documento de uso interno, no es un comprobante tributario.]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
+
+</jasperReport>

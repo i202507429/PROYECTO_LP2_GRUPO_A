@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}">
+	<title>Comprobante de Pedido</title>
+</head>
+
+<body class="bg-light">
+
+	<div class="container py-4">
+
+		<div class="d-flex justify-content-between align-items-center mb-3">
+			<h4 class="m-0"><i class="fa-solid fa-receipt me-2 text-danger"></i>Comprobante de tu pedido</h4>
+			<div class="d-flex gap-2">
+				<button onclick="imprimirComprobante()" class="btn btn-danger">
+					<i class="fa-solid fa-print me-1"></i>Imprimir
+				</button>
+				<a href="/catalogo" class="btn btn-outline-secondary">
+					<i class="fa-solid fa-arrow-left me-1"></i>Volver
+				</a>
+			</div>
+		</div>
+
+		<div class="card shadow-sm">
+			<div class="card-body p-0">
+				<iframe id="frameComprobante"
+				        th:src="@{/reporte/pedido(numPedido=${idPedido})}"
+				        style="width: 100%; height: 80vh; border: none;">
+				</iframe>
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+		function imprimirComprobante() {
+			document.getElementById('frameComprobante').contentWindow.print();
+		}
+	</script>
+
+</body>
+
+</html>

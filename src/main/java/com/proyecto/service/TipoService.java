@@ -15,7 +15,6 @@ public class TipoService {
 
 	private final TipoRepository tipoRepository;
 
-	
 	public List<Tipo> listar() {
 		return tipoRepository.findAll();
 	}

@@ -25,7 +25,6 @@
 						<tr>
 							<th>#</th>
 							<th>Descripción</th>
-							<th>Estado</th>
 							<th>Acciones</th>
 						</tr>
 					</thead>
@@ -33,26 +32,15 @@
 						<tr th:each="tamanio : ${lstTamanios}">
 							<td th:text="${tamanio.idTamanio}"></td>
 							<td th:text="${tamanio.descripcion}"></td>
-							<td>
-								<span th:classappend="${tamanio.activo} ? 'badge bg-success' : 'badge bg-danger'"
-									th:text="${tamanio.activo} ? 'Activo' : 'Inactivo'">
-								</span>
-							</td>
 							<td class="d-flex gap-1">
-								<a th:href="@{/tamanio/edicion/{id}(id=${tamanio.idTamanio})}" class="btn btn-sm btn-warning">
-									<i class="fa-solid fa-pen-to-square"></i>
-								</a>
-								<form th:action="@{/tamanio/cambiar-estado/{id}(id=${tamanio.idTamanio})}" method="post">
-									<button type="submit" class="btn btn-sm" th:classappend="${tamanio.activo} ? 'btn-secondary' : 'btn-success'"
-										th:title="${tamanio.activo} ? 'Desactivar' : 'Activar'">
-										<i class="fa-solid" th:classappend="${tamanio.activo} ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
-									</button>
-								</form>
-								<form th:action="@{/tamanio/eliminar/{id}(id=${tamanio.idTamanio})}" method="post" class="form-eliminar">
-									<button type="submit" class="btn btn-sm btn-danger">
-										<i class="fa-solid fa-trash"></i>
-									</button>
-								</form>
+							    <a th:href="@{/tamanio/edicion/{id}(id=${tamanio.idTamanio})}" class="btn btn-sm btn-warning">
+							        <i class="fa-solid fa-pen-to-square"></i>
+							    </a>
+							    <form th:action="@{/tamanio/eliminar/{id}(id=${tamanio.idTamanio})}" method="post" class="form-eliminar">
+							        <button type="submit" class="btn btn-sm btn-danger">
+							            <i class="fa-solid fa-trash"></i>
+							        </button>
+							    </form>
 							</td>
 						</tr>
 					</tbody>
@@ -81,6 +69,24 @@
 				});
 			});
 		});
+	</script>
+
+	<div id="dataModalEliminacion"
+	     th:if="${modalEliminacion}"
+	     th:data-mensaje="${modalEliminacion}"
+	     th:data-tipo="${modalTipo}"
+	     style="display:none;"></div>
+
+	<script>
+		const dataModal = document.getElementById('dataModalEliminacion');
+		if (dataModal) {
+			Swal.fire({
+				icon: dataModal.dataset.tipo,
+				title: dataModal.dataset.tipo === 'success' ? 'Eliminado' : 'No se pudo eliminar',
+				text: dataModal.dataset.mensaje,
+				confirmButtonColor: '#dc3545'
+			});
+		}
 	</script>
 
 </body>
